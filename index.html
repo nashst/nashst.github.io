@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiikawa 消消乐</title>
+    <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>Chiikawa 消消乐</h1>
+            <div class="score-container">
+                <span>分数: </span>
+                <span id="score">0</span>
+            </div>
+            <div class="time-container">
+                <span>时间: </span>
+                <span id="time">60</span>
+            </div>
+        </div>
+        <div class="game-board" id="game-board"></div>
+        <div class="game-controls">
+            <button id="start-button">开始游戏</button>
+            <button id="restart-button">重新开始</button>
+        </div>
+    </div>
+    <div class="game-over" id="game-over">
+        <div class="game-over-content">
+            <h2>游戏结束!</h2>
+            <p>你的分数: <span id="final-score">0</span></p>
+            <button id="play-again-button">再玩一次</button>
+        </div>
+    </div>
+    <script src="./js/game.js"></script>
+</body>
+</html>

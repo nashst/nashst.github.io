@@ -1,0 +1,155 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #ffebee;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.game-container {
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    padding: 20px;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.game-header {
+    margin-bottom: 20px;
+}
+
+.game-header h1 {
+    color: #ff6b6b;
+    font-size: 2rem;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.score-container, .time-container {
+    display: inline-block;
+    margin: 0 10px;
+    font-size: 1.2rem;
+    color: #333;
+    background-color: #f8bbd0;
+    padding: 5px 15px;
+    border-radius: 20px;
+}
+
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-gap: 5px;
+    margin: 0 auto 20px;
+    max-width: 400px;
+}
+
+.tile {
+    width: 100%;
+    padding-bottom: 100%; /* 保持正方形比例 */
+    position: relative;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: transform 0.2s, opacity 0.3s;
+}
+
+.tile img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.tile.selected {
+    transform: scale(0.9);
+    box-shadow: 0 0 10px #ffeb3b;
+}
+
+.tile.matched {
+    opacity: 0;
+}
+
+.game-controls {
+    margin-top: 20px;
+}
+
+button {
+    background-color: #ff6b6b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #ff4757;
+}
+
+.game-over {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    display: none;
+}
+
+.game-over-content {
+    background-color: white;
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.game-over-content h2 {
+    color: #ff6b6b;
+    margin-bottom: 20px;
+}
+
+.game-over-content p {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+/* 响应式设计 */
+@media (max-width: 500px) {
+    .game-board {
+        grid-template-columns: repeat(6, 1fr);
+        grid-gap: 3px;
+    }
+    
+    .game-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .score-container, .time-container {
+        font-size: 1rem;
+        padding: 3px 10px;
+    }
+}
