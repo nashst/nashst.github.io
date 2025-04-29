@@ -629,27 +629,57 @@ let highScores = [];
 
 function endGame() {
     gameState.isPlaying = false;
-    
     // 停止计时器
     clearInterval(gameState.timer);
-    
     // 添加当前分数到排行榜
     highScores.push(gameState.score);
     highScores.sort((a, b) => b - a); // 降序排序
     highScores = highScores.slice(0, 5); // 只保留前5名
-    
+    // 判断是否新高
+    let isNewRecord = gameState.score >= highScores[0];
     // 显示游戏结束屏幕
     finalScoreElement.textContent = gameState.score;
-    
     // 更新排行榜显示
     const scoreList = document.getElementById('score-list');
     scoreList.innerHTML = highScores
         .map((score, index) => `<li>${index + 1}. ${score}</li>`)
         .join('');
-    
+    // 新高时触发礼花和表扬
+    if(isNewRecord) {
+        showConfetti();
+        showPraise();
+    }
     gameOverScreen.style.display = 'flex';
 }
-
+// 礼花动画函数
+function showConfetti() {
+    const confettiContainer = document.getElementById('confetti-container');
+    confettiContainer.style.display = 'block';
+    // 简单彩带动画
+    for(let i=0;i<80;i++){
+        let confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random()*100+'vw';
+        confetti.style.background = `hsl(${Math.random()*360},100%,60%)`;
+        confetti.style.animationDelay = Math.random()*0.5+'s';
+        confettiContainer.appendChild(confetti);
+    }
+    setTimeout(()=>{
+        confettiContainer.innerHTML = '';
+        confettiContainer.style.display = 'none';
+    }, 2500);
+}
+// 表扬语显示
+function showPraise() {
+    const gameOverContent = document.querySelector('.game-over-content');
+    let praise = document.createElement('div');
+    praise.className = 'praise-text';
+    praise.innerText = '恭喜你创造新纪录！';
+    gameOverContent.insertBefore(praise, gameOverContent.firstChild);
+    setTimeout(()=>{
+        praise.remove();
+    }, 2500);
+}
 // 事件监听器
 startButton.addEventListener('click', () => {
     startGame();

@@ -276,3 +276,33 @@ button:hover {
         padding: 3px 10px;
     }
 }
+/* 礼花动画样式 */
+.confetti {
+    position: absolute;
+    top: -20px;
+    width: 10px;
+    height: 30px;
+    border-radius: 3px;
+    opacity: 0.8;
+    animation: confetti-fall 2.5s cubic-bezier(.4,0,.2,1) forwards;
+}
+@keyframes confetti-fall {
+    to {
+        top: 100vh;
+        transform: rotate(360deg);
+        opacity: 0.5;
+    }
+}
+.praise-text {
+    font-size: 1.5rem;
+    color: #ff9800;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    animation: praise-pop 0.5s ease;
+}
+@keyframes praise-pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    80% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
