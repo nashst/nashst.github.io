@@ -19,7 +19,27 @@
                 <span id="time">60</span>
             </div>
         </div>
-        <div class="game-board" id="game-board"></div>
+        <div class="game-content">
+            <div class="game-board" id="game-board"></div>
+            <div class="tools-container">
+                <h3>道具</h3>
+                <div class="tool-item" id="undo-tool">
+                    <div class="tool-icon">↩️</div>
+                    <div class="tool-name">后退一步</div>
+                    <div class="tool-count">1次</div>
+                </div>
+                <div class="tool-item" id="force-swap-tool">
+                    <div class="tool-icon">🔄</div>
+                    <div class="tool-name">强制交换</div>
+                    <div class="tool-count">1次</div>
+                </div>
+                <div class="tool-item" id="explode-tool">
+                    <div class="tool-icon">💥</div>
+                    <div class="tool-name">强制消除</div>
+                    <div class="tool-count">1次</div>
+                </div>
+            </div>
+        </div>
         <div class="game-controls">
             <button id="start-button">开始游戏</button>
             <button id="restart-button">重新开始</button>

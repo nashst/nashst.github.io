@@ -16,7 +16,23 @@ let gameState = {
     selectedTile: null,
     board: [],
     timer: null,
-    comboCount: 0
+    comboCount: 0,
+    // 道具状态
+    tools: {
+        undo: {
+            available: true,
+            active: false
+        },
+        forceSwap: {
+            available: true,
+            active: false
+        },
+        explode: {
+            available: true,
+            active: false
+        }
+    },
+    lastMove: null // 记录上一步操作
 };
 
 // DOM元素
@@ -29,6 +45,11 @@ const gameOverScreen = document.getElementById('game-over');
 const finalScoreElement = document.getElementById('final-score');
 const playAgainButton = document.getElementById('play-again-button');
 
+// 道具元素
+const undoTool = document.getElementById('undo-tool');
+const forceSwapTool = document.getElementById('force-swap-tool');
+const explodeTool = document.getElementById('explode-tool');
+
 // 初始化游戏
 function initGame() {
     // 重置游戏状态
@@ -37,6 +58,15 @@ function initGame() {
     gameState.isPlaying = false;
     gameState.selectedTile = null;
     gameState.comboCount = 0;
+    gameState.lastMove = null;
+    
+    // 重置道具状态
+    gameState.tools.undo.available = true;
+    gameState.tools.undo.active = false;
+    gameState.tools.forceSwap.available = true;
+    gameState.tools.forceSwap.active = false;
+    gameState.tools.explode.available = true;
+    gameState.tools.explode.active = false;
     
     // 更新UI
     scoreElement.textContent = gameState.score;
@@ -50,6 +80,9 @@ function initGame() {
     
     // 隐藏游戏结束屏幕
     gameOverScreen.style.display = 'none';
+    
+    // 更新道具UI
+    updateToolsUI();
 }
 
 // 创建游戏板
@@ -107,6 +140,16 @@ function handleTileClick(event) {
     const row = parseInt(tile.dataset.row);
     const col = parseInt(tile.dataset.col);
     
+    // 检查是否有激活的道具
+    if (gameState.tools.explode.active) {
+        // 使用强制消除道具
+        explodeTile(row, col);
+        gameState.tools.explode.active = false;
+        gameState.tools.explode.available = false;
+        updateToolsUI();
+        return;
+    }
+    
     // 如果已经有选中的瓦片
     if (gameState.selectedTile) {
         const selectedRow = parseInt(gameState.selectedTile.dataset.row);
@@ -114,8 +157,20 @@ function handleTileClick(event) {
         
         // 检查是否是相邻的瓦片
         if (isAdjacent(row, col, selectedRow, selectedCol)) {
-            // 交换瓦片
-            swapTiles(row, col, selectedRow, selectedCol);
+            // 保存当前状态用于撤销
+            saveCurrentState();
+            
+            // 检查是否使用强制交换道具
+            if (gameState.tools.forceSwap.active) {
+                // 强制交换瓦片，不检查是否匹配
+                forceSwapTiles(row, col, selectedRow, selectedCol);
+                gameState.tools.forceSwap.active = false;
+                gameState.tools.forceSwap.available = false;
+                updateToolsUI();
+            } else {
+                // 正常交换瓦片
+                swapTiles(row, col, selectedRow, selectedCol);
+            }
             
             // 取消选中
             gameState.selectedTile.classList.remove('selected');
@@ -142,33 +197,43 @@ function isAdjacent(row1, col1, row2, col2) {
 }
 
 // 交换瓦片
-// 游戏状态历史记录
-let gameStateHistory = [];
-
-function saveGameState() {
-    // 深拷贝当前游戏状态
-    const stateCopy = JSON.parse(JSON.stringify(gameState));
-    gameStateHistory.push(stateCopy);
-    
-    // 限制历史记录数量
-    if (gameStateHistory.length > 10) {
-        gameStateHistory.shift();
-    }
+// 保存当前状态用于撤销
+function saveCurrentState() {
+    // 深拷贝当前游戏板状态
+    const boardCopy = JSON.parse(JSON.stringify(gameState.board));
+    gameState.lastMove = {
+        board: boardCopy,
+        score: gameState.score,
+        comboCount: gameState.comboCount
+    };
 }
 
+// 撤销上一步操作
 function undoLastMove() {
-    if (gameStateHistory.length > 0) {
-        gameState = gameStateHistory.pop();
+    if (gameState.lastMove && gameState.tools.undo.available) {
+        // 恢复游戏板状态
+        gameState.board = gameState.lastMove.board;
+        gameState.score = gameState.lastMove.score;
+        gameState.comboCount = gameState.lastMove.comboCount;
+        
+        // 更新UI
         updateBoardUI();
+        scoreElement.textContent = gameState.score;
+        
+        // 标记道具为已使用
+        gameState.tools.undo.available = false;
+        updateToolsUI();
     }
 }
 
-function forceSwap(row1, col1, row2, col2) {
+// 强制交换瓦片
+function forceSwapTiles(row1, col1, row2, col2) {
     // 强制交换，不检查匹配
     const temp = gameState.board[row1][col1];
     gameState.board[row1][col1] = gameState.board[row2][col2];
     gameState.board[row2][col2] = temp;
     
+    // 更新UI
     updateBoardUI();
     
     // 检查匹配
@@ -177,6 +242,7 @@ function forceSwap(row1, col1, row2, col2) {
     }, 300);
 }
 
+// 强制消除瓦片
 function explodeTile(row, col) {
     // 清除3x3范围内的元素
     for (let r = Math.max(0, row-1); r <= Math.min(config.rows-1, row+1); r++) {
@@ -185,12 +251,55 @@ function explodeTile(row, col) {
         }
     }
     
+    // 更新UI
     updateBoardUI();
     
-    // 检查匹配
+    // 下落瓦片并填充空位
     setTimeout(() => {
-        checkMatches();
+        dropTiles();
+        fillEmptyTiles();
+        updateBoardUI();
+        
+        // 检查匹配
+        setTimeout(() => {
+            checkMatches();
+        }, 300);
     }, 300);
+}
+
+// 更新道具UI
+function updateToolsUI() {
+    // 更新后退一步道具
+    if (gameState.tools.undo.available) {
+        undoTool.classList.remove('disabled');
+        undoTool.querySelector('.tool-count').textContent = '1次';
+    } else {
+        undoTool.classList.add('disabled');
+        undoTool.querySelector('.tool-count').textContent = '0次';
+    }
+    
+    // 更新强制交换道具
+    if (gameState.tools.forceSwap.available) {
+        forceSwapTool.classList.remove('disabled');
+        forceSwapTool.querySelector('.tool-count').textContent = '1次';
+    } else {
+        forceSwapTool.classList.add('disabled');
+        forceSwapTool.querySelector('.tool-count').textContent = '0次';
+    }
+    
+    // 更新强制消除道具
+    if (gameState.tools.explode.available) {
+        explodeTool.classList.remove('disabled');
+        explodeTool.querySelector('.tool-count').textContent = '1次';
+    } else {
+        explodeTool.classList.add('disabled');
+        explodeTool.querySelector('.tool-count').textContent = '0次';
+    }
+    
+    // 更新激活状态
+    undoTool.classList.toggle('active', gameState.tools.undo.active);
+    forceSwapTool.classList.toggle('active', gameState.tools.forceSwap.active);
+    explodeTool.classList.toggle('active', gameState.tools.explode.active);
 }
 
 function swapTiles(row1, col1, row2, col2) {
@@ -559,6 +668,46 @@ restartButton.addEventListener('click', () => {
 playAgainButton.addEventListener('click', () => {
     // 初始化新游戏
     initGame();
+});
+
+// 道具点击事件
+undoTool.addEventListener('click', () => {
+    if (!gameState.isPlaying || !gameState.tools.undo.available) return;
+    
+    // 取消其他道具的激活状态
+    gameState.tools.forceSwap.active = false;
+    gameState.tools.explode.active = false;
+    
+    // 直接使用撤销功能
+    undoLastMove();
+});
+
+forceSwapTool.addEventListener('click', () => {
+    if (!gameState.isPlaying || !gameState.tools.forceSwap.available) return;
+    
+    // 切换激活状态
+    gameState.tools.forceSwap.active = !gameState.tools.forceSwap.active;
+    
+    // 取消其他道具的激活状态
+    gameState.tools.undo.active = false;
+    gameState.tools.explode.active = false;
+    
+    // 更新UI
+    updateToolsUI();
+});
+
+explodeTool.addEventListener('click', () => {
+    if (!gameState.isPlaying || !gameState.tools.explode.available) return;
+    
+    // 切换激活状态
+    gameState.tools.explode.active = !gameState.tools.explode.active;
+    
+    // 取消其他道具的激活状态
+    gameState.tools.undo.active = false;
+    gameState.tools.forceSwap.active = false;
+    
+    // 更新UI
+    updateToolsUI();
 });
 
 // 初始化游戏
