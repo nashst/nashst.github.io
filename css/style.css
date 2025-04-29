@@ -88,6 +88,45 @@ body {
     margin-top: 20px;
 }
 
+.powerup-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.powerup-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+}
+
+.powerup-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.powerup-btn.undo {
+    background-color: #2196F3;
+}
+
+.powerup-btn.swap {
+    background-color: #FF9800;
+}
+
+.powerup-btn.explode {
+    background-color: #F44336;
+}
+
 button {
     background-color: #ff6b6b;
     color: white;

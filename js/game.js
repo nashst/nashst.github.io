@@ -142,6 +142,57 @@ function isAdjacent(row1, col1, row2, col2) {
 }
 
 // 交换瓦片
+// 游戏状态历史记录
+let gameStateHistory = [];
+
+function saveGameState() {
+    // 深拷贝当前游戏状态
+    const stateCopy = JSON.parse(JSON.stringify(gameState));
+    gameStateHistory.push(stateCopy);
+    
+    // 限制历史记录数量
+    if (gameStateHistory.length > 10) {
+        gameStateHistory.shift();
+    }
+}
+
+function undoLastMove() {
+    if (gameStateHistory.length > 0) {
+        gameState = gameStateHistory.pop();
+        updateBoardUI();
+    }
+}
+
+function forceSwap(row1, col1, row2, col2) {
+    // 强制交换，不检查匹配
+    const temp = gameState.board[row1][col1];
+    gameState.board[row1][col1] = gameState.board[row2][col2];
+    gameState.board[row2][col2] = temp;
+    
+    updateBoardUI();
+    
+    // 检查匹配
+    setTimeout(() => {
+        checkMatches();
+    }, 300);
+}
+
+function explodeTile(row, col) {
+    // 清除3x3范围内的元素
+    for (let r = Math.max(0, row-1); r <= Math.min(config.rows-1, row+1); r++) {
+        for (let c = Math.max(0, col-1); c <= Math.min(config.cols-1, col+1); c++) {
+            gameState.board[r][c] = 0; // 0表示空
+        }
+    }
+    
+    updateBoardUI();
+    
+    // 检查匹配
+    setTimeout(() => {
+        checkMatches();
+    }, 300);
+}
+
 function swapTiles(row1, col1, row2, col2) {
     // 交换数据
     const temp = gameState.board[row1][col1];
