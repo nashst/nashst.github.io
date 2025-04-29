@@ -50,11 +50,10 @@ body {
 
 .game-content {
     display: flex;
-    justify-content: flex-start;
+    flex-direction: row;
     align-items: flex-start;
-    margin-bottom: 30px;
-    margin-left: 80px;
-    margin-right: 60px;
+    justify-content: center;
+    margin-left: 0;
 }
 
 .game-board {
@@ -263,6 +262,7 @@ button:hover {
         flex-direction: row;
         justify-content: space-around;
         padding: 6px 2px;
+        min-width: unset;
     }
     .tool-item {
         width: 30%;
