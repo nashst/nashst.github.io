@@ -3,7 +3,7 @@ const config = {
     rows: 8,
     cols: 6,
     types: 5, // Chiikawa角色类型数量
-    initialTime: 60,
+    initialTime: 100,
     matchScore: 10, // 每消除一个图标得分
     comboBonus: 5 // 连击奖励分数
 };
@@ -515,14 +515,29 @@ function startGame() {
 }
 
 // 结束游戏
+// 排行榜数组
+let highScores = [];
+
 function endGame() {
     gameState.isPlaying = false;
     
     // 停止计时器
     clearInterval(gameState.timer);
     
+    // 添加当前分数到排行榜
+    highScores.push(gameState.score);
+    highScores.sort((a, b) => b - a); // 降序排序
+    highScores = highScores.slice(0, 5); // 只保留前5名
+    
     // 显示游戏结束屏幕
     finalScoreElement.textContent = gameState.score;
+    
+    // 更新排行榜显示
+    const scoreList = document.getElementById('score-list');
+    scoreList.innerHTML = highScores
+        .map((score, index) => `<li>${index + 1}. ${score}</li>`)
+        .join('');
+    
     gameOverScreen.style.display = 'flex';
 }
 
