@@ -246,7 +246,7 @@ button:hover {
 /* 响应式设计 */
 @media (max-width: 700px) {
     .game-content {
-        flex-direction: column;
+        flex-direction: column !important;
         align-items: center;
         margin-left: 0;
     }
@@ -259,7 +259,7 @@ button:hover {
     .tools-container {
         width: 100%;
         margin-left: 0;
-        flex-direction: row;
+        flex-direction: row !important;
         justify-content: space-around;
         padding: 6px 2px;
         min-width: unset;
